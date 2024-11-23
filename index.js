@@ -1,8 +1,13 @@
-require("dotenv").config();
+const fs = require("node:fs");
+const path = require("node:path");
 const { accessSecret } = require("./secret_manager");
 
-const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
-const { registerCommands } = require("./src/Utils/util");
+const {
+  Client,
+  GatewayIntentBits,
+  ActivityType,
+  Collection,
+} = require("discord.js");
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -14,6 +19,37 @@ const client = new Client({
 (async () => {
   const token = await accessSecret("Discord_Dev_Bot");
 
-  await registerCommands(token);
+  client.commands = new Collection();
+  const folderPath = path.join(__dirname, "/src/commands");
+  const commandFiles = fs
+    .readdirSync(folderPath)
+    .filter((file) => file.endsWith(".js"));
+  for (const file of commandFiles) {
+    const filePath = path.join(folderPath, file);
+    const command = require(filePath);
+    if ("data" in command && "execute" in command) {
+      client.commands.set(command.data.name, command);
+    } else {
+      console.log(
+        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+      );
+    }
+  }
+
+  const eventsPath = path.join(__dirname, "/src/events");
+  const eventFiles = fs
+    .readdirSync(eventsPath)
+    .filter((file) => file.endsWith(".js"));
+
+  for (const file of eventFiles) {
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
+    if (event.once) {
+      client.once(event.name, (...args) => event.execute(...args));
+    } else {
+      client.on(event.name, (...args) => event.execute(...args));
+    }
+  }
+
   client.login(token);
 })();
