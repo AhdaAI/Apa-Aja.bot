@@ -1,9 +1,13 @@
 FROM node:22-slim
 
-ARG Token=InsertYourToken
-ARG ClientID=YourClientID
-ARG GuildID
+WORKDIR /usr/src/app
 
-ENV Token=${Token}
-ENV ClientID=${ClientID}
-ENV GuildID=${GuildID}
+COPY package.json .
+
+RUN npm i
+
+COPY . ./
+
+RUN export GOOGLE_APPLICATION_CREDENTIALS="./GCP_Service_Account.json"
+
+CMD [ "npm", "start" ]

@@ -2,6 +2,7 @@ require("dotenv").config();
 const { accessSecret } = require("./secret_manager");
 
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
+const { registerCommands } = require("./src/Utils/util");
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -13,5 +14,6 @@ const client = new Client({
 (async () => {
   const token = await accessSecret("Discord_Dev_Bot");
 
+  await registerCommands(token);
   client.login(token);
 })();

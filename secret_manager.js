@@ -6,7 +6,7 @@ const client = new SecretManagerServiceClient({
 });
 
 async function accessSecret(secretName) {
-  console.log(`Looking for secret: ${secretName}`);
+  console.log(`[ GCP ] Looking for secret: ${secretName}`);
   try {
     // Construct the resource name of the secret version
     const [version] = await client.accessSecretVersion({
@@ -15,7 +15,6 @@ async function accessSecret(secretName) {
 
     // Extract the payload
     const payload = version.payload.data.toString("utf8");
-    console.log(`Secret Found.`);
     return payload;
   } catch (error) {
     console.error("Error accessing secret:", error);
