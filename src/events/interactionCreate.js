@@ -22,7 +22,9 @@ module.exports = {
           const roleList = await database.readData(selectedGuild, "role");
 
           if (!roleList) {
-            await database.addData(selectedGuild, "role", [cleanSelected]);
+            await database.addData(selectedGuild, "role", {
+              data: cleanSelected,
+            });
             break;
           }
 
@@ -36,9 +38,22 @@ module.exports = {
             updatedList.push(cleanSelected);
           }
 
-          await database.updateData(selectedGuild, "role", updatedList);
+          await database.updateData(selectedGuild, "role", {
+            data: updatedList,
+          });
           break;
 
+        case "selectrole":
+          await interaction.update({ content: "" });
+          const selectedRole = await interaction.guild.roles.fetch(
+            interaction.values[0]
+          );
+          const member = interaction.member;
+
+          member.roles.cache.some((rl) => rl.id == selectedRole.id)
+            ? await member.roles.remove(selectedRole)
+            : await member.roles.add(selectedRole);
+          break;
         default:
           await interaction.reply({
             content: "Failed to find select menu.",

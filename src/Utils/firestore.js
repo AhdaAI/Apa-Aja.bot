@@ -12,7 +12,7 @@ const firestore = new Firestore({ databaseId: "apaaja" });
  */
 async function addData(collectionId, documentId, data) {
   const docRef = firestore.collection(`${collectionId}`).doc(`${documentId}`);
-  await docRef.set({ data });
+  await docRef.set(data);
   console.log("Document written successfully!");
 }
 
@@ -29,7 +29,7 @@ async function readData(collectionId, documentId) {
 
   if (!doc.exists) {
     console.log("No such document!");
-    return;
+    return null;
   }
 
   console.log("Document data:", doc.data());
@@ -44,7 +44,7 @@ async function readData(collectionId, documentId) {
  */
 async function updateData(collectionId, documentId, data) {
   const docRef = firestore.collection(`${collectionId}`).doc(`${documentId}`);
-  await docRef.update({ data });
+  await docRef.update(data);
   console.log("Document updated successfully!");
 }
 
