@@ -1,4 +1,8 @@
-const { Events, CommandInteraction } = require("discord.js");
+const {
+  Events,
+  CommandInteraction,
+  PermissionsBitField,
+} = require("discord.js");
 const { database } = require("../Utils/util");
 
 module.exports = {
@@ -11,6 +15,15 @@ module.exports = {
     if (interaction.isStringSelectMenu()) {
       switch (interaction.customId) {
         case "role":
+          const user = interaction.member;
+          if (!user.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+            await interaction.reply({
+              content: "You don't have permission to use this command.",
+              ephemeral: true,
+            });
+            return;
+          }
+
           await interaction.update({ content: "" });
           const selected = await interaction.guild.roles.fetch(
             interaction.values[0]

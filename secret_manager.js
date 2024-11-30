@@ -17,7 +17,7 @@ async function accessSecret(secretName) {
     const payload = version.payload.data.toString("utf8");
     return payload;
   } catch (error) {
-    console.error("Error accessing secret:", error);
+    console.error("Error accessing secret: ", error);
   }
 }
 

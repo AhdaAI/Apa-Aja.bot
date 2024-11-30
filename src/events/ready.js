@@ -31,7 +31,9 @@ module.exports = {
     }
 
     (async () => {
-      const clientId = await accessSecret("Discord_Dev_Client_Id");
+      const clientId = client.dev
+        ? await accessSecret("Discord_Dev_Client_Id")
+        : await accessSecret("Discord_Client_Id");
       const guildId = await accessSecret("Discord_Dev_Server");
       const rest = new REST().setToken(client.token);
 

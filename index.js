@@ -16,8 +16,13 @@ const client = new Client({
   ],
 });
 
+client.dev = new Collection();
+client.dev = process.argv[2] === "dev" ? true : false;
+
 (async () => {
-  const token = await accessSecret("Discord_Dev_Bot");
+  const token = client.dev
+    ? await accessSecret("Discord_Dev_Bot")
+    : await accessSecret("Discord_Bot");
 
   client.commands = new Collection();
   const folderPath = path.join(__dirname, "/src/commands");
@@ -51,5 +56,5 @@ const client = new Client({
     }
   }
 
-  client.login(token);
+  await client.login(token);
 })();

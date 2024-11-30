@@ -99,17 +99,17 @@ module.exports = {
         const channel = interaction.options.getChannel("channel");
         const serverData = await database.readData(serverId, "misc");
         const embed = new EmbedBuilder()
-          .setTitle(serverData ? serverData.data.title : interaction.guild.name)
-          .setDescription(serverData ? serverData.data.description : null)
+          .setTitle(serverData?.data.title ?? interaction.guild.name)
+          .setDescription(serverData?.data.description ?? null)
           .setThumbnail(interaction.guild.iconURL())
-          .setURL(serverData ? serverData.data.url : null)
+          .setURL(serverData?.data.url ?? null)
           .setTimestamp();
 
         const rules = await database.readData(serverId, "rules");
         if (rules != null) {
           embed.addFields({
             name: "Rules",
-            value: await database.readData(serverId, "rules"),
+            value: rules.data.join("\n"),
             inline: true,
           });
         }
@@ -119,7 +119,7 @@ module.exports = {
           .setCustomId("selectrole")
           .setPlaceholder("Select role...");
         if (rolesList == null || rolesList.data.length == 0) {
-          await interaction.reply({
+          await interaction.editReply({
             content: "Role not found. Please add role or update role.",
             ephemeral: true,
           });
