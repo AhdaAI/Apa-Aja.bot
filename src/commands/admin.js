@@ -7,6 +7,10 @@ const {
   SlashCommandIntegerOption,
 } = require("discord.js");
 const { database } = require("../Utils/util");
+const { rule_management } = require("./admin_subcommands/rule_management");
+const { role_management } = require("./admin_subcommands/role_management");
+const { misc_management } = require("./admin_subcommands/misc_management");
+const { admin_embed } = require("./admin_subcommands/admin_embed");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -52,6 +56,11 @@ module.exports = {
             .setName("id")
             .setDescription("Select the id.")
         )
+        .addStringOption(
+          new SlashCommandStringOption()
+            .setName("value")
+            .setDescription("Add value.")
+        )
     )
     .addSubcommand(
       new SlashCommandSubcommandBuilder()
@@ -90,11 +99,12 @@ module.exports = {
       return;
     }
 
+    await interaction.deferReply({ ephemeral: true });
+
     const serverId = interaction.guildId;
 
     switch (interaction.options.getSubcommand()) {
       case "rules":
-        await interaction.deferReply({ ephemeral: true });
         const rule = interaction.options.getString("rule");
         const rules_data = await database.readData(serverId, "rules");
 
@@ -109,10 +119,10 @@ module.exports = {
           content: `Rule added.\nRule: ${rule}`,
           ephemeral: true,
         });
+
         break;
 
       case "misc":
-        await interaction.deferReply({ ephemeral: true });
         const option = interaction.options.getString("options");
         const value = interaction.options.getString("value");
         const misc_data = await database.readData(serverId, "misc");
@@ -127,13 +137,72 @@ module.exports = {
         }
 
         await interaction.editReply({
-          content: "Misc updated.",
+          content: `Misc updated.\nOption: ${option}\nValue: ${value}`,
           ephemeral: true,
         });
+
+        break;
+
+      case "manage":
+        const type = interaction.options.getString("type");
+        const action = interaction.options.getString("action");
+        const id = interaction.options.getInteger("id");
+        const new_value = interaction.options.getString("value");
+
+        switch (type) {
+          case "rule":
+            await rule_management();
+            await interaction.editReply({
+              content: `Rule ${action}`,
+              ephemeral: true,
+            });
+            break;
+
+          case "role":
+            if (action == "update") {
+              await interaction.editReply({
+                content: "Feature has not been implemented yet.",
+                ephemeral: true,
+              });
+              break;
+            }
+
+            await role_management(serverId, action, id);
+            await interaction.editReply({
+              content: `Role ${action}`,
+              ephemeral: true,
+            });
+            break;
+
+          case "misc":
+            await misc_management(serverId, action, id, new_value);
+            await interaction.editReply({
+              content: `Misc ${action}`,
+              ephemeral: true,
+            });
+            break;
+
+          default:
+            await interaction.editReply({
+              content: "No action taken.",
+              ephemeral: true,
+            });
+            break;
+        }
+
         break;
 
       default:
+        await interaction.editReply({
+          content: "Something went wrong.",
+          ephemeral: true,
+        });
         break;
     }
+
+    await interaction.followUp({
+      embeds: [await admin_embed(serverId)],
+      ephemeral: true,
+    });
   },
 };

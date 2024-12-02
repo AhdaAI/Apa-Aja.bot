@@ -106,10 +106,14 @@ module.exports = {
           .setTimestamp();
 
         const rules = await database.readData(serverId, "rules");
-        if (rules != null) {
+        if (rules != null && rules.data.length > 0) {
+          const displayed_rules = rules.data.map((dat) => {
+            return `• ${dat}`;
+          });
+
           embed.addFields({
             name: "Rules",
-            value: rules.data.join("\n"),
+            value: displayed_rules.join("\n"),
             inline: true,
           });
         }

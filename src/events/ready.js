@@ -34,7 +34,6 @@ module.exports = {
       const clientId = client.dev
         ? await accessSecret("Discord_Dev_Client_Id")
         : await accessSecret("Discord_Client_Id");
-      const guildId = await accessSecret("Discord_Dev_Server");
       const rest = new REST().setToken(client.token);
 
       try {
@@ -42,25 +41,35 @@ module.exports = {
           `Started refreshing ${commands.length} application (/) commands.`
         );
 
-        const globalData = await rest.put(
-          Routes.applicationCommands(clientId),
-          {
-            body: commands,
-          }
-        );
+        if (client.dev) {
+          console.log("=== Development mode ===");
+          const guildId = await accessSecret("Discord_Dev_Server");
+          const guildData = await rest.put(
+            Routes.applicationGuildCommands(clientId, guildId),
+            {
+              body: commands,
+            }
+          );
 
-        const guildData = await rest.put(
-          Routes.applicationGuildCommands(clientId, guildId),
-          {
-            body: commands,
-          }
-        );
+          console.log(
+            `[ Guild ] Successfully reloaded ${guildData.length} application (/) commands.`
+          );
 
-        console.log(
-          `[ Global ] Successfully reloaded ${globalData.length} application (/) commands.`
-        );
+          return commands;
+        } else {
+          const globalData = await rest.put(
+            Routes.applicationCommands(clientId),
+            {
+              body: commands,
+            }
+          );
 
-        return commands;
+          console.log(
+            `[ Global ] Successfully reloaded ${globalData.length} application (/) commands.`
+          );
+
+          return commands;
+        }
       } catch (error) {
         // And of course, make sure you catch and log any errors!
         console.error(error);
