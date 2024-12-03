@@ -13,7 +13,7 @@ const firestore = new Firestore({ databaseId: "apaaja" });
 async function addData(collectionId, documentId, data) {
   const docRef = firestore.collection(`${collectionId}`).doc(`${documentId}`);
   await docRef.set(data);
-  console.log("Document written successfully!");
+  console.log("[ Firestore ] Document written successfully!");
 }
 
 /**
@@ -28,11 +28,11 @@ async function readData(collectionId, documentId) {
   const doc = await docRef.get();
 
   if (!doc.exists) {
-    console.log("No such document!");
+    console.log("[ Firestore ] No such document!");
     return null;
   }
 
-  console.log("Document data:", doc.data());
+  console.log("[ Firestore ] Document found!");
   return doc.data();
 }
 
@@ -45,7 +45,7 @@ async function readData(collectionId, documentId) {
 async function updateData(collectionId, documentId, data) {
   const docRef = firestore.collection(`${collectionId}`).doc(`${documentId}`);
   await docRef.update(data);
-  console.log("Document updated successfully!");
+  console.log("[ Firestore ] Document updated successfully!");
 }
 
 /**
@@ -56,7 +56,7 @@ async function updateData(collectionId, documentId, data) {
 async function deleteData(collectionId, documentId) {
   const docRef = firestore.collection(`${collectionId}`).doc(`${documentId}`);
   await docRef.delete();
-  console.log("Document deleted successfully!");
+  console.log("[ Firestore ] Document deleted successfully!");
 }
 
 module.exports = { addData, readData, updateData, deleteData };

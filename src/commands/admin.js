@@ -151,7 +151,7 @@ module.exports = {
 
         switch (type) {
           case "rule":
-            await rule_management();
+            await rule_management(serverId, action, id, new_value);
             await interaction.editReply({
               content: `Rule ${action}`,
               ephemeral: true,
@@ -161,7 +161,8 @@ module.exports = {
           case "role":
             if (action == "update") {
               await interaction.editReply({
-                content: "Feature has not been implemented yet.",
+                content:
+                  "Feature has not been implemented yet.\nRelated command : /role register",
                 ephemeral: true,
               });
               break;

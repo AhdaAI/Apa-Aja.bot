@@ -48,9 +48,22 @@ module.exports = {
 
     const misc = await database.readData(serverId, "misc");
     if (misc != null) {
-      misc.embed.addFields({
+      const temp_misc = [];
+      const misc_data = misc.data;
+      const misc_keys = Object.keys(misc_data);
+      misc_keys.forEach((key) => temp_misc.push(`${key} : ${misc_data[key]}`));
+
+      num = 0;
+      const displayed_misc = temp_misc.map((data) => {
+        const temp = `${num} - ${data}`;
+        num++;
+
+        return temp;
+      });
+
+      embed.addFields({
         name: "Misc",
-        value: codeBlock(JSON.stringify(misc.data, null, 2)),
+        value: displayed_misc.join("\n") ?? "No misc found.",
         inline: false,
       });
     }

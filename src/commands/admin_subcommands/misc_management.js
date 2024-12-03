@@ -10,11 +10,19 @@ module.exports = {
    * @returns
    */
   async misc_management(serverId, action, id, new_value) {
-    if (!id || !new_value) return null;
-
     const misc_data = await database.readData(serverId, "misc");
-    if (!misc_data || misc_data.data.length() === 0) return null;
+    if (!misc_data || misc_data.length === 0) return null;
 
-    console.log(misc_data);
+    const data = misc_data.data;
+    const keys_obj = Object.keys(data);
+    const looked = keys_obj[id];
+
+    if (action === "remove") {
+      data[looked] = null;
+      await database.updateData(serverId, "misc", { data: data });
+    } else if (action === "update") {
+      data[looked] = new_value;
+      await database.updateData(serverId, "misc", { data: data });
+    }
   },
 };

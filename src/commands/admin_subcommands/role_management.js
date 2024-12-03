@@ -14,7 +14,7 @@ module.exports = {
     value = value ?? "";
 
     const role_data = await database.readData(serverId, "role");
-    if (!role_data && role_data.data.length() === 0) return null;
+    if (!role_data || role_data.data.length === 0) return null;
 
     const data = role_data.data;
     switch (action) {
