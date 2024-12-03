@@ -24,6 +24,11 @@ client.dev = process.argv[2] === "dev" ? true : false;
     ? await accessSecret("Discord_Dev_Bot")
     : await accessSecret("Discord_Bot");
 
+  if (!token) {
+    console.log("Token not found.");
+    console.log("Please check GCP Credentials.");
+  }
+
   client.commands = new Collection();
   const folderPath = path.join(__dirname, "/src/commands");
   const commandFiles = fs
