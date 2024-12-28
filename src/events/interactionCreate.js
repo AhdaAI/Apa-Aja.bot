@@ -36,7 +36,7 @@ module.exports = {
 
           if (!roleList) {
             await database.addData(selectedGuild, "role", {
-              data: cleanSelected,
+              data: [cleanSelected],
             });
             break;
           }

@@ -1,4 +1,4 @@
-FROM node:22-slim
+FROM node:slim
 
 WORKDIR /usr/src/app
 
@@ -8,6 +8,6 @@ RUN npm i
 
 COPY . ./
 
-RUN export GOOGLE_APPLICATION_CREDENTIALS="./GCP_Service_Account.json"
+ENV GOOGLE_APPLICATION_CREDENTIALS="/usr/src/app/GCP_Service_Account.json"
 
 CMD [ "npm", "start" ]

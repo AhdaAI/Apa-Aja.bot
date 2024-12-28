@@ -132,7 +132,7 @@ module.exports = {
           await database.updateData(serverId, "misc", misc_data);
         } else {
           await database.addData(serverId, "misc", {
-            data: { option: value },
+            data: { option: value }, // a bug is this
           });
         }
 
