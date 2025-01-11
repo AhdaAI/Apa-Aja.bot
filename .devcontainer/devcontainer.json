@@ -1,0 +1,11 @@
+// See https://containers.dev/implementors/json_reference/ for configuration reference
+{
+	"name": "Untitled Node.js project",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"remoteUser": "node",
+	"containerEnv": {
+		"GOOGLE_APPLICATION_CREDENTIALS": "$HOME/GCP_Service_Account.json"
+	}
+}
