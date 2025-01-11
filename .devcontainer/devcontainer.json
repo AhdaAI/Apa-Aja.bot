@@ -6,6 +6,16 @@
 	},
 	"remoteUser": "node",
 	"containerEnv": {
-		"GOOGLE_APPLICATION_CREDENTIALS": "$HOME/GCP_Service_Account.json"
+		"GOOGLE_APPLICATION_CREDENTIALS": "/workspaces/Discord_Bot/GCP_Service_Account.json",
+		"DISCORD_DEV_BOT": "${localEnv:DISCORD_DEV_TOKEN}"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"VisualStudioExptTeam.vscodeintellicode",
+				"esbenp.prettier-vscode"
+			]
+		}
 	}
 }
