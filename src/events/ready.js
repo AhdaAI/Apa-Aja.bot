@@ -2,6 +2,7 @@ const { Events, Client, REST, Routes } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
 const { accessSecret } = require("../../secret_manager");
+const { fprint } = require("../../utils/basic")
 
 const commands = [];
 const folderPath = path.join(__dirname, "../commands");
@@ -24,9 +25,7 @@ module.exports = {
       if ("data" in command && "execute" in command) {
         commands.push(command.data.toJSON());
       } else {
-        console.log(
-          `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-        );
+        fprint("WARNING", `The command at ${filePath} is missing a required "data" or "execute" property.`)
       }
     }
 
@@ -42,7 +41,7 @@ module.exports = {
         );
 
         if (client.dev) {
-          console.log("=== Development mode ===");
+          fprint("MODE", `=== Development mode ===`)
           const guildId = await accessSecret("Discord_Dev_Server");
           const guildData = await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
@@ -51,9 +50,7 @@ module.exports = {
             }
           );
 
-          console.log(
-            `[ Guild ] Successfully reloaded ${guildData.length} application (/) commands.`
-          );
+          fprint("GUILD", `Successfully reloaded ${guildData.length} application (/) commands.`)
 
           return commands;
         } else {
@@ -64,9 +61,7 @@ module.exports = {
             }
           );
 
-          console.log(
-            `[ Global ] Successfully reloaded ${globalData.length} application (/) commands.`
-          );
+          fprint("GLOBAL", `Successfully reloaded ${globalData.length} application (/) commands.`)
 
           return commands;
         }
@@ -75,6 +70,6 @@ module.exports = {
         console.error(error);
       }
     })();
-    console.log(`[ Ready ] Logged in as ${client.user.username}`);
+    fprint("READY", `Logged in as ${client.user.username}`)
   },
 };
