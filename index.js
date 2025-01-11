@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { accessSecret } = require("./secret_manager");
+const { fprint } = require("./utils/basic")
 
 const {
   Client,
@@ -21,12 +22,13 @@ client.dev = process.argv[2] === "dev" ? true : false;
 
 (async () => {
   const token = client.dev
-    ? await accessSecret("Discord_Dev_Bot")
+    ? process.env.DISCORD_DEV_BOT
     : await accessSecret("Discord_Bot");
 
   if (!token) {
     console.log("Token not found.");
     console.log("Please check GCP Credentials.");
+    process.exit(1)
   }
 
   client.commands = new Collection();
@@ -61,5 +63,11 @@ client.dev = process.argv[2] === "dev" ? true : false;
     }
   }
 
-  await client.login(token);
+  try{
+    await client.login(token);
+  } catch (e) {
+    console.error("[ Client ] Client Error: ", e)
+    console.log(token)
+    process.exit(1)
+  }
 })();
