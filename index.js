@@ -1,7 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { accessSecret } = require("./secret_manager");
-const { fprint } = require("./utils/basic")
 
 const {
   Client,
@@ -28,7 +27,7 @@ client.dev = process.argv[2] === "dev" ? true : false;
   if (!token) {
     console.log("Token not found.");
     console.log("Please check GCP Credentials.");
-    process.exit(1)
+    process.exit(1);
   }
 
   client.commands = new Collection();
@@ -63,11 +62,11 @@ client.dev = process.argv[2] === "dev" ? true : false;
     }
   }
 
-  try{
+  try {
     await client.login(token);
   } catch (e) {
-    console.error("[ Client ] Client Error: ", e)
-    console.log(token)
-    process.exit(1)
+    console.error("[ Client ] Client Error: ", e);
+    console.log(token);
+    process.exit(1);
   }
 })();

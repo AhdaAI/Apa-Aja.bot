@@ -2,7 +2,6 @@ const { Events, Client, REST, Routes } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
 const { accessSecret } = require("../../secret_manager");
-const { fprint } = require("../../utils/basic")
 
 const commands = [];
 const folderPath = path.join(__dirname, "../commands");
@@ -25,7 +24,10 @@ module.exports = {
       if ("data" in command && "execute" in command) {
         commands.push(command.data.toJSON());
       } else {
-        fprint("WARNING", `The command at ${filePath} is missing a required "data" or "execute" property.`)
+        console.log(
+          "WARNING",
+          `The command at ${filePath} is missing a required "data" or "execute" property.`
+        );
       }
     }
 
@@ -41,7 +43,7 @@ module.exports = {
         );
 
         if (client.dev) {
-          fprint("MODE", `=== Development mode ===`)
+          console.log("MODE", `=== Development mode ===`);
           const guildId = await accessSecret("Discord_Dev_Server");
           const guildData = await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
@@ -50,7 +52,10 @@ module.exports = {
             }
           );
 
-          fprint("GUILD", `Successfully reloaded ${guildData.length} application (/) commands.`)
+          console.log(
+            "GUILD",
+            `Successfully reloaded ${guildData.length} application (/) commands.`
+          );
 
           return commands;
         } else {
@@ -61,7 +66,10 @@ module.exports = {
             }
           );
 
-          fprint("GLOBAL", `Successfully reloaded ${globalData.length} application (/) commands.`)
+          console.log(
+            "GLOBAL",
+            `Successfully reloaded ${globalData.length} application (/) commands.`
+          );
 
           return commands;
         }
@@ -70,6 +78,6 @@ module.exports = {
         console.error(error);
       }
     })();
-    fprint("READY", `Logged in as ${client.user.username}`)
+    console.log("READY", `Logged in as ${client.user.username}`);
   },
 };
