@@ -1,16 +1,14 @@
 const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
-const { fprint } = require("./utils/basic")
-require("dotenv").config();
 
-const header = "GCP"
-fprint(header, `Project ID: ${process.env.PROJECTID}`)
+const header = "GCP";
+console.log(header, `Project ID: ${process.env.PROJECTID}`);
 // Create a Secret Manager client
 const client = new SecretManagerServiceClient({
   projectId: process.env.PROJECTID,
 });
 
 async function accessSecret(secretName) {
-  fprint(header, `Looking for secret: ${secretName}`)
+  console.log(header, `Looking for secret: ${secretName}`);
   // console.log(`[ GCP ] Looking for secret: ${secretName}`);
   try {
     // Construct the resource name of the secret version
@@ -23,7 +21,7 @@ async function accessSecret(secretName) {
     return payload;
   } catch (error) {
     console.error("[ GCP ] Error accessing secret: ", error);
-    process.exit(1)
+    process.exit(1);
   }
 }
 

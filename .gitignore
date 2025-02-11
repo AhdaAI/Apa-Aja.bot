@@ -1,3 +1,4 @@
 node_modules
 .env
+.env.*
 GCP_Service_Account.json

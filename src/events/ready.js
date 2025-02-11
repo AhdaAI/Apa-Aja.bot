@@ -1,7 +1,6 @@
 const { Events, Client, REST, Routes } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
-const { accessSecret } = require("../../secret_manager");
 
 const commands = [];
 const folderPath = path.join(__dirname, "../commands");
@@ -32,9 +31,7 @@ module.exports = {
     }
 
     (async () => {
-      const clientId = client.dev
-        ? await accessSecret("Discord_Dev_Client_Id")
-        : await accessSecret("Discord_Client_Id");
+      const clientId = process.env.CLIENT_ID;
       const rest = new REST().setToken(client.token);
 
       try {
@@ -43,8 +40,7 @@ module.exports = {
         );
 
         if (client.dev) {
-          console.log("MODE", `=== Development mode ===`);
-          const guildId = await accessSecret("Discord_Dev_Server");
+          const guildId = process.env.GUILD_ID;
           const guildData = await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
             {
@@ -78,6 +74,6 @@ module.exports = {
         console.error(error);
       }
     })();
-    console.log("READY", `Logged in as ${client.user.username}`);
+    console.log("READY", `Logged in as '${client.user.username}'`);
   },
 };

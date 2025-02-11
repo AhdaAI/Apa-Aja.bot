@@ -1,6 +1,24 @@
+const { exit } = require("node:process");
+const { loadEnv, registerEnv } = require("./utils/util");
+if (!loadEnv()) {
+  console.log("[?] [?] Failed to load environment variable. [?] [?]");
+  console.log("Please check your existing environment file.");
+  exit(1);
+}
+
+if (process.argv[2] !== "dev") {
+  const { accessSecret } = require("./secret_manager");
+
+  async () => {
+    registerEnv("TOKEN", await accessSecret("Discord_Bot"));
+    registerEnv("CLIENT_ID", await accessSecret("Discord_Client_Id"));
+  };
+} else {
+  console.log("==== Developer mode ====");
+}
+
 const fs = require("node:fs");
 const path = require("node:path");
-const { accessSecret } = require("./secret_manager");
 
 const {
   Client,
@@ -20,15 +38,7 @@ client.dev = new Collection();
 client.dev = process.argv[2] === "dev" ? true : false;
 
 (async () => {
-  const token = client.dev
-    ? process.env.DISCORD_DEV_BOT
-    : await accessSecret("Discord_Bot");
-
-  if (!token) {
-    console.log("Token not found.");
-    console.log("Please check GCP Credentials.");
-    process.exit(1);
-  }
+  const TOKEN = process.env.TOKEN;
 
   client.commands = new Collection();
   const folderPath = path.join(__dirname, "/src/commands");
@@ -63,10 +73,10 @@ client.dev = process.argv[2] === "dev" ? true : false;
   }
 
   try {
-    await client.login(token);
+    await client.login(TOKEN);
   } catch (e) {
     console.error("[ Client ] Client Error: ", e);
-    console.log(token);
+    console.log(TOKEN);
     process.exit(1);
   }
 })();
