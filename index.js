@@ -10,8 +10,10 @@ if (!loadEnv()) {
 if (process.argv[2] !== "dev") {
   const { accessSecret } = require("./secret_manager");
 
-  registerEnv("TOKEN", accessSecret("Discord_Bot"));
-  registerEnv("CLIENT_ID", accessSecret("Discord_Client_Id"));
+  async () => {
+    registerEnv("TOKEN", await accessSecret("Discord_Bot"));
+    registerEnv("CLIENT_ID", await accessSecret("Discord_Client_Id"));
+  };
 } else {
   console.log("==== Developer mode ====");
 }
