@@ -5,7 +5,7 @@ sudo apt update -y
 sudo apt install -y nodejs npm
 
 # Install pm2 globally
-npm install -g pm2
+sudo npm install -g pm2
 
 # Navigate to bot directory
 cd "$(dirname "$0")" || exit
