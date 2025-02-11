@@ -5,7 +5,10 @@ sudo apt update -y
 sudo apt install -y nodejs npm
 
 # Install pm2 globally
-sudo npm install -g pm2
+if ! command -v pm2 &> /dev/null; then
+    echo "PM2 not found! Installing..."
+    sudo npm install -g pm2
+fi
 
 # Navigate to bot directory
 cd "$(dirname "$0")" || exit
@@ -14,7 +17,7 @@ cd "$(dirname "$0")" || exit
 npm install
 
 # pm2 command
-pm2 start index.js --name "Discord-bot"
+pm2 start ecosystem.config.js
 pm2 save
 pm2 startup systemd | sudo tee /etc/systemd/system/pm2-init.sh
 sudo chmod +x /etc/systemd/system/pm2-init.sh
