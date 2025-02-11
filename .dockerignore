@@ -1,2 +1,7 @@
 node_modules
 .devcontainer
+.vscode
+.env.*
+.gitignore
+
+readme.md

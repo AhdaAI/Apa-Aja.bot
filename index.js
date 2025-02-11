@@ -1,10 +1,5 @@
 const { exit } = require("node:process");
 const { loadEnv, registerEnv } = require("./utils/util");
-if (!loadEnv()) {
-  console.log("[?] [?] Failed to load environment variable. [?] [?]");
-  console.log("Please check your existing environment file.");
-  exit(1);
-}
 
 if (process.argv[2] !== "dev") {
   const { accessSecret } = require("./secret_manager");
@@ -14,6 +9,11 @@ if (process.argv[2] !== "dev") {
     registerEnv("CLIENT_ID", await accessSecret("Discord_Client_Id"));
   };
 } else {
+  if (!loadEnv()) {
+    console.log("[?] [?] Failed to load environment variable. [?] [?]");
+    console.log("Please check your existing environment file.");
+    exit(1);
+  }
   console.log("==== Developer mode ====");
 }
 
