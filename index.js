@@ -7,17 +7,6 @@ if (!loadEnv()) {
   exit(1);
 }
 
-if (process.argv[2] !== "dev") {
-  const { accessSecret } = require("./secret_manager");
-
-  async () => {
-    registerEnv("TOKEN", await accessSecret("Discord_Bot"));
-    registerEnv("CLIENT_ID", await accessSecret("Discord_Client_Id"));
-  };
-} else {
-  console.log("==== Developer mode ====");
-}
-
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -39,6 +28,19 @@ client.dev = new Collection();
 client.dev = process.argv[2] === "dev" ? true : false;
 
 (async () => {
+  if (process.argv[2] !== "dev") {
+    const { accessSecret } = require("./secret_manager");
+
+    const [_TOKEN, _CLIENT] = await Promise.all([
+      accessSecret("Discord_Bot"),
+      accessSecret("Discord_Client_Id"),
+    ]);
+    registerEnv("TOKEN", _TOKEN);
+    registerEnv("CLIENT_ID", _CLIENT);
+  } else {
+    console.log("==== Developer mode ====");
+  }
+
   const TOKEN = process.env.TOKEN;
 
   client.commands = new Collection();
