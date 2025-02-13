@@ -4,6 +4,16 @@
 sudo apt update -y
 sudo apt install -y nodejs npm
 
+# Checking for GCP Credentials
+SERVICE_ACCOUNT="GCP_Service_Account.json"
+
+if [ -f "$SERVICE_ACCOUNT" ]; then
+    echo "GCP service account file found! Setting environment variable..."
+    export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/$SERVICE_ACCOUNT_FILE"
+else
+    echo "No GCP service account file found. Running with .env file only."
+fi
+
 # Install pm2 globally
 if ! command -v pm2 &> /dev/null; then
     echo "PM2 not found! Installing..."
