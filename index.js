@@ -16,6 +16,7 @@ const {
   ActivityType,
   Collection,
 } = require("discord.js");
+const { log } = require("node:console");
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds],
@@ -32,13 +33,15 @@ const folderPath = path.join(__dirname, "/src/commands");
 const commandFiles = fs
   .readdirSync(folderPath)
   .filter((file) => file.endsWith(".js"));
+
+log(`# Found ${commandFiles.length} commands.`);
 for (const file of commandFiles) {
   const filePath = path.join(folderPath, file);
   const command = require(filePath);
   if ("data" in command && "execute" in command) {
     client.commands.set(command.data.name, command);
   } else {
-    console.log(
+    log(
       `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
     );
   }
@@ -49,6 +52,7 @@ const eventFiles = fs
   .readdirSync(eventsPath)
   .filter((file) => file.endsWith(".js"));
 
+log(`# Found ${eventFiles.length} events.`);
 for (const file of eventFiles) {
   const filePath = path.join(eventsPath, file);
   const event = require(filePath);
@@ -73,7 +77,7 @@ for (const file of eventFiles) {
     registerEnv("TOKEN", _TOKEN);
     registerEnv("CLIENT_ID", _CLIENT);
   } else {
-    console.log("==== Developer mode ====");
+    log("==== Developer mode ====");
   }
 
   await client.login(process.env.TOKEN);

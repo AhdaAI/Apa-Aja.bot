@@ -1,14 +1,14 @@
+const { log } = require("console");
 const fs = require("fs");
 const path = require("path");
 
 function loadEnv() {
+  log("# Registering .env variable.");
   // Checking for env file name
   let fileName;
   if (fs.existsSync(path.resolve(".env"))) {
-    console.log("Found '.env'");
     fileName = ".env";
   } else {
-    console.log("Trying '.env.dev'");
     fileName = ".env.dev";
   }
 
@@ -20,7 +20,6 @@ function loadEnv() {
   envContent.split("\n").forEach((line) => {
     const [key, value] = line.split("=").map((part) => part.trim());
     if (key && value && !process.env[key]) {
-      console.log(`Found ${key} …`);
       process.env[key] = value;
     }
   });
