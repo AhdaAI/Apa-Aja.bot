@@ -67,7 +67,7 @@ for (const file of eventFiles) {
   /**
    * Below need to be an async function
    */
-  if (process.argv[2] !== "dev") {
+  if (process.env.NODE_ENV === "production") {
     const { accessSecret } = require("./secret_manager");
 
     const [_TOKEN, _CLIENT] = await Promise.all([
