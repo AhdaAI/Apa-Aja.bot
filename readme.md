@@ -1,9 +1,10 @@
 # Apa-Aja.bot
 
-This is a Discord bot built using Node.js and the Discord.js library. The bot includes various commands and event handlers to manage roles, rules, and other server-related tasks.
+I made this bot because of a hobby, feel free to fork it and add other functionality to the bot.
+
+This is a simple Node.js based discord bot, all the commands and events are located on src folder.
 
 ## Deployment Setup
 
 1. Clone the repository.
-2. Give execution permission to `setup.sh` file.
-3. Run the script `./setup.sh`
+2. Run `npm start` for production and `npm run dev` for development.
