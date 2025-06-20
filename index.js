@@ -2,20 +2,16 @@ const FS = require("fs");
 const PATH = require("path");
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 });
 const { getSecret } = require("./GCP/secret_manager");
 let envFileName;
 
 if (process.env.NODE_ENV === "production") {
-  console.log("[ ] Running in production environment.");
+  console.log("===== Running in production environment. =====");
   envFileName = ".env.production";
 } else {
-  console.log("[ ] Running in development environment.");
+  console.log("===== Running in development environment. =====");
   envFileName = ".env.development";
 }
 
@@ -108,7 +104,7 @@ const eventFiles = FS.readdirSync(PATH.join(__dirname, "events")).filter(
 for (const file of eventFiles) {
   const event = require(`./events/${file}`);
   if (event.name && event.execute) {
-    if (event.once){
+    if (event.once) {
       client.once(event.name, (...args) => event.execute(...args, client));
       console.log(`[ ] Event ${event.name} loaded successfully (once).`);
     } else {
