@@ -1,0 +1,22 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "Discord bot integrated with google cloud provider.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Discord",
+    "Bot",
+    "GCP"
+  ],
+  "author": "Ahda Akmalul Ilmi",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/secret-manager": "^6.0.1",
+    "bufferutil": "^4.0.9",
+    "discord.js": "^14.20.0"
+  }
+}
