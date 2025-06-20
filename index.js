@@ -1,7 +1,6 @@
 const FS = require("fs");
 const PATH = require("path");
-const DISCORD = require("discord.js");
-const { Client, GatewayIntentBits } = DISCORD;
+const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -86,3 +85,39 @@ if (!process.env.DISCORD_TOKEN) {
     }
   })();
 }
+
+// Command collection
+client.commands = new Collection();
+const commandFiles = FS.readdirSync(PATH.join(__dirname, "commands")).filter(
+  (file) => file.endsWith(".js")
+);
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  if (command.data && command.execute) {
+    client.commands.set(command.data.name, command);
+    console.log(`[ ] Command ${command.data.name} loaded successfully.`);
+  } else {
+    console.warn(`[!] Command ${file} is missing required properties.`);
+  }
+}
+
+// Event handling
+const eventFiles = FS.readdirSync(PATH.join(__dirname, "events")).filter(
+  (file) => file.endsWith(".js")
+);
+for (const file of eventFiles) {
+  const event = require(`./events/${file}`);
+  if (event.name && event.execute) {
+    if (event.once){
+      client.once(event.name, (...args) => event.execute(...args, client));
+      console.log(`[ ] Event ${event.name} loaded successfully (once).`);
+    } else {
+      client.on(event.name, (...args) => event.execute(...args, client));
+      console.log(`[ ] Event ${event.name} loaded successfully.`);
+    }
+  } else {
+    console.warn(`[!] Event ${file} is missing required properties.`);
+  }
+}
+
+client.login(process.env.DISCORD_TOKEN);
