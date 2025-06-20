@@ -1,0 +1,34 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# dotenv environment variables file
+.env
+.env.*
+
+# VS Code settings
+.vscode/
+
+# Mac system files
+.DS_Store
+
+# Google Cloud credentials
+*.json
+google-credentials.json
+gcloud-service-key.json
+service-account.json
+service-account-*.json
+credentials.json
+.gcloud/
