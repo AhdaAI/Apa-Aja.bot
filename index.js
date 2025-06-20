@@ -10,14 +10,27 @@ const client = new Client({
   ],
 });
 const { getSecret } = require("./GCP/secret_manager");
+let envFileName;
+
+if (process.env.NODE_ENV === "production") {
+  console.log("[ ] Running in production environment.");
+  envFileName = ".env.production";
+} else {
+  console.log("[ ] Running in development environment.");
+  envFileName = ".env.development";
+}
 
 // Load environment variables
-console.log("[ ] Checking .env file...");
-let envFilePath = PATH.join(__dirname, ".env");
+console.log("[ ] Checking environment variable...");
+let envFilePath = PATH.join(__dirname, envFileName);
 if (!FS.existsSync(envFilePath)) {
-  console.error("[?] .env file not found. Assuming production environment.");
-  console.log("[!] Using .env.production as fallback.");
-  envFilePath = PATH.join(__dirname, ".env.production");
+  console.error(
+    `[!] Environment file ${envFileName} not found at ${envFilePath}`
+  );
+  console.log(
+    "[?] Please create the file with the required environment variables."
+  );
+  process.exit(1);
 }
 
 try {
