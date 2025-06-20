@@ -1,22 +1,26 @@
 const fs = require("fs");
 const path = require("path");
-const { REST, Routes } = require("discordjs");
+const { REST, Routes } = require("discord.js");
 const { getSecret } = require("./GCP/secret_manager");
 
 // Load environment variables
 let envFileName;
 if (process.env.NODE_ENV === "production") {
-  console.log("[ ] Running in production environment.");
+  console.log("===== Running in production environment. =====");
   envFileName = ".env.production";
 } else {
-  console.log("[ ] Running in development environment.");
+  console.log("===== Running in development environment. =====");
   envFileName = ".env.development";
 }
 
 let envFilePath = path.join(__dirname, envFileName);
 if (!fs.existsSync(envFilePath)) {
-  console.error(`[!] Environment file ${envFileName} not found at ${envFilePath}`);
-  console.log("[?] Please create the file with the required environment variables.");
+  console.error(
+    `[!] Environment file ${envFileName} not found at ${envFilePath}`
+  );
+  console.log(
+    "[?] Please create the file with the required environment variables."
+  );
   process.exit(1);
 }
 try {
@@ -36,7 +40,6 @@ try {
   console.error(`[?] Error reading .env file: ${error.message}`);
   process.exit(1);
 }
-
 
 const commands = [];
 const folderPath = path.join(__dirname, "commands");
@@ -80,12 +83,9 @@ async function deployCommands() {
 
     if (process.env.NODE_ENV === "production") {
       console.log("[ ] Deploying commands to production environment.");
-      await rest.put(
-        Routes.applicationCommands(process.env.CLIENT_ID),
-        {
-          body: commands,
-        }
-      );
+      await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+        body: commands,
+      });
     } else {
       console.log("[ ] Deploying commands to development environment.");
       await rest.put(
