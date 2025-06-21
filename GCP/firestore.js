@@ -27,7 +27,6 @@ async function setGuildConfig(guildId, configData) {
       },
       { merge: true }
     );
-    console.log(`[ ] New guild configured for ${guildId}`);
   } catch (error) {
     console.error(`[?] Error saving guild config for ${guildId}: `, error);
     throw error;
