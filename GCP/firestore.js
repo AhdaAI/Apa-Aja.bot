@@ -1,8 +1,11 @@
 const { Firestore, Timestamp } = require("@google-cloud/firestore");
 const path = require("path");
 
+const collectionName = "guilds";
+
 const db = new Firestore({
-  projectId: process.env.GOOGLE_CLOUD_PROJECT
+  projectId: process.env.GOOGLE_CLOUD_PROJECT,
+  databaseId: process.env.GOOGLE_DATABASE,
 });
 
 // ----- Guild Config -----
@@ -15,16 +18,40 @@ const db = new Firestore({
  */
 async function setGuildConfig(guildId, configData) {
   try {
-    const guildRef = db.collection('guild').doc(guildId)
-    await guildRef.set({
-      id: guildId,
-      ...configData,
-      lastUpdated: Timestamp.now()
-    }, {merge: true})
-    console.log(`[ ] New guild configured for ${guildId}`)
+    const guildRef = db.collection(collectionName).doc(guildId);
+    await guildRef.set(
+      {
+        id: guildId,
+        ...configData,
+        lastUpdated: Timestamp.now(),
+      },
+      { merge: true }
+    );
+    console.log(`[ ] New guild configured for ${guildId}`);
   } catch (error) {
-    console.error(`[?] Error saving guild config for ${guildId}: `, error)
-    throw error
+    console.error(`[?] Error saving guild config for ${guildId}: `, error);
+    throw error;
+  }
+}
+
+// ----- Check Guild Config Exists -----
+/**
+ *
+ * @param {string} guildId
+ * @returns {Promise<boolean|null>}
+ */
+async function checkGuildConfig(guildId) {
+  try {
+    const doc = await db.collection(collectionName).doc(guildId).get();
+
+    if (!doc.exists) {
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error when checking for guild ${guildId}: `, error);
+    throw error;
   }
 }
 
@@ -36,16 +63,16 @@ async function setGuildConfig(guildId, configData) {
  */
 async function getGuildConfig(guildId) {
   try {
-    const doc = await db.collection('guild').doc(guildId).get()
+    const doc = await db.collection(collectionName).doc(guildId).get();
 
     if (!doc.exists) {
-      return null
+      return null;
     }
 
-    return doc.data()
+    return doc.data();
   } catch (error) {
-    console.error(`[?] Error getting guild config for ${guildId}: `, error)
-    throw error
+    console.error(`[?] Error getting guild config for ${guildId}: `, error);
+    throw error;
   }
 }
 
@@ -58,14 +85,14 @@ async function getGuildConfig(guildId) {
  */
 async function updateGuildConfig(guildId, updates) {
   try {
-    const guildRef = db.collection('guild').doc(guildId)
+    const guildRef = db.collection(collectionName).doc(guildId);
     await guildRef.update({
       ...updates,
-      lastUpdated: Timestamp.now()
-    })
+      lastUpdated: Timestamp.now(),
+    });
   } catch (error) {
-    console.error(`[?] Error updating guild config for ${guildId}: `, error)
-    throw error
+    console.error(`[?] Error updating guild config for ${guildId}: `, error);
+    throw error;
   }
 }
 
@@ -77,8 +104,7 @@ async function updateGuildConfig(guildId, updates) {
  */
 async function deleteGuildConfig(guildId) {
   try {
-    await db.collection('guilds').doc(guildId).delete();
-    console.log(`Guild config for ${guildId} deleted.`);
+    await db.collection(collectionName).doc(guildId).delete();
   } catch (error) {
     console.error(`Error deleting guild config for ${guildId}:`, error);
     throw error;
@@ -95,12 +121,11 @@ async function deleteGuildConfig(guildId) {
  */
 async function addGuildRole(guildId, role) {
   try {
-    const guildRef = db.collection('guilds').doc(guildId);
+    const guildRef = db.collection(collectionName).doc(guildId);
     await guildRef.update({
       roles: Firestore.FieldValue.arrayUnion(role), // Atomically adds to array
-      lastUpdated: Timestamp.now()
+      lastUpdated: Timestamp.now(),
     });
-    console.log(`Role added to guild ${guildId}.`);
   } catch (error) {
     console.error(`Error adding role to guild ${guildId}:`, error);
     throw error;
@@ -116,12 +141,11 @@ async function addGuildRole(guildId, role) {
  */
 async function removeGuildRole(guildId, role) {
   try {
-    const guildRef = db.collection('guilds').doc(guildId);
+    const guildRef = db.collection(collectionName).doc(guildId);
     await guildRef.update({
       roles: Firestore.FieldValue.arrayRemove(role), // Atomically removes from array
-      lastUpdated: Timestamp.now()
+      lastUpdated: Timestamp.now(),
     });
-    console.log(`Role removed from guild ${guildId}.`);
   } catch (error) {
     console.error(`Error removing role from guild ${guildId}:`, error);
     throw error;
@@ -138,12 +162,11 @@ async function removeGuildRole(guildId, role) {
  */
 async function updateSubscriptionStatus(guildId, subscriptionType, status) {
   try {
-    const guildRef = db.collection('guilds').doc(guildId);
+    const guildRef = db.collection(collectionName).doc(guildId);
     await guildRef.update({
       [`subscription.${subscriptionType}`]: status, // Use dot notation for nested fields
-      lastUpdated: Timestamp.now()
+      lastUpdated: Timestamp.now(),
     });
-    console.log(`Subscription "${subscriptionType}" for guild ${guildId} set to ${status}.`);
   } catch (error) {
     console.error(`Error updating subscription for guild ${guildId}:`, error);
     throw error;
@@ -151,7 +174,6 @@ async function updateSubscriptionStatus(guildId, subscriptionType, status) {
 }
 
 module.exports = {
-  initializeFirestore,
   setGuildConfig,
   getGuildConfig,
   updateGuildConfig,
@@ -159,4 +181,5 @@ module.exports = {
   addGuildRole,
   removeGuildRole,
   updateSubscriptionStatus,
+  checkGuildConfig,
 };
