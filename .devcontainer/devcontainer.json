@@ -10,7 +10,9 @@
       "extensions": [
         "streetsidesoftware.code-spell-checker",
         "esbenp.prettier-vscode",
-        "oderwat.indent-rainbow"
+        "oderwat.indent-rainbow",
+        "dbaeumer.vscode-eslint",
+        "BriteSnow.vscode-toggle-quotes"
       ]
     }
   },
