@@ -71,15 +71,22 @@ const rest = new REST({ version: "10" }).setToken(
   process.env.DISCORD_TOKEN || ""
 );
 
-async function deployCommands() {
-  try {
-    console.log("[ ] Started refreshing application (/) commands.");
+(async () => {
+  // Register commands with Discord
+  if (!process.env.CLIENT_ID) {
+    console.error("[!] CLIENT_ID environment variable is not set.");
+    process.exit(1);
+  }
 
-    // Register commands with Discord
-    if (!process.env.CLIENT_ID) {
-      console.error("[!] CLIENT_ID environment variable is not set.");
-      process.exit(1);
-    }
+  try {
+    console.log("[ ] Attempting to delete all global commands...");
+    // Sending an empty array to the global commands endpoint
+    await rest.put(
+      Routes.applicationCommands(process.env.CLIENT_ID),
+      { body: [] } // Send an empty array
+    );
+
+    console.log("[ ] Started refreshing application (/) commands.");
 
     if (process.env.NODE_ENV === "production") {
       console.log("[ ] Deploying commands to production environment.");
@@ -104,4 +111,4 @@ async function deployCommands() {
     console.error(`[!] Error deploying commands: ${error.message}`);
     process.exit(1);
   }
-}
+})();
