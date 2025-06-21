@@ -1,7 +1,17 @@
-const { Events } = require("discord.js");
+const {
+  Events,
+  ChatInputCommandInteraction,
+  MessageFlags,
+} = require("discord.js");
 
 module.exports = {
   name: Events.InteractionCreate,
+  /**
+   *
+   * @param {ChatInputCommandInteraction} interaction
+   * @param {*} client
+   * @returns
+   */
   async execute(interaction, client) {
     if (!interaction.isCommand()) return;
 
@@ -19,10 +29,17 @@ module.exports = {
         `[!] Error executing command ${interaction.commandName}:`,
         error
       );
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
+      if (interaction.replied) {
+        await interaction.followUp({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      } else {
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      }
     }
   },
 };
