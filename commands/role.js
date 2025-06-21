@@ -6,6 +6,14 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
+const {
+  getGuildConfig,
+  updateGuildConfig,
+  setGuildConfig,
+  checkGuildConfig,
+  addGuildRole,
+  removeGuildRole,
+} = require("../GCP/firestore");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -25,7 +33,7 @@ module.exports = {
             .setDescription("Choose the role...")
             .setRequired(false)
         )
-        .addIntegerOption((option) =>
+        .addStringOption((option) =>
           option
             .setName("id")
             .setDescription("Input role ID...")
@@ -42,7 +50,7 @@ module.exports = {
             .setDescription("Choose the role...")
             .setRequired(false)
         )
-        .addIntegerOption((option) =>
+        .addStringOption((option) =>
           option
             .setName("id")
             .setDescription("Input role ID...")
@@ -50,30 +58,83 @@ module.exports = {
         )
     ),
 
-    /**
-     * 
-     * @param {ChatInputCommandInteraction} interaction 
-     */
-    async execute(interaction) {
-      await interaction.reply({flags: MessageFlags.Ephemeral, content: "Processing command..."})
+  /**
+   *
+   * @param {ChatInputCommandInteraction} interaction
+   */
+  async execute(interaction) {
+    const { options } = interaction;
+    const subCommand = options.getSubcommand();
 
-      const {options} = interaction
-      const subCommand = options.getSubcommand()
-      const roleID = options.getInteger('id')
-      let role
+    if (subCommand === "help") {
+      await interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "Add and remove role based on the selected role or the role id."
+      })
+      return
+    }
 
-      if (subCommand === "add") {
-        role = options.getRole('role')
+    await interaction.reply({
+      flags: MessageFlags.Ephemeral,
+      content: "Processing command...",
+    });
 
-        if (roleID && !role) {
-          try {
-            role = interaction.guild.roles.cache.get(roleID) ?? await interaction.guild.roles.fetch(roleID)
-          } catch (error) {
-            console.log(`[?] Error fetching role ${roleID}`)
-            await interaction.followUp({flags: MessageFlags.Ephemeral, content: `Could not find role ID : ${roleID}`})
-          }
-        }
-
+    const dataExists = await checkGuildConfig(interaction.guildId);
+    if (!dataExists) {
+      try {
+        const defaultData = {
+          id: interaction.guild.id,
+          title: interaction.guild.name,
+          roles: [],
+          subscription: {
+            epic: false,
+            steam: false,
+          },
+          webhook: "",
+        };
+        await setGuildConfig(interaction.guildId, defaultData);
+      } catch (error) {
+        throw error;
       }
     }
+
+    const roleID = options.getString("id");
+
+    let role = options.getRole("role");
+
+    if (roleID && !role) {
+      try {
+        role =
+          interaction.guild.roles.cache.get(roleID) ??
+          (await interaction.guild.roles.fetch(roleID));
+      } catch (error) {
+        console.log(`[?] Error fetching role ${roleID}`);
+        await interaction.followUp({
+          flags: MessageFlags.Ephemeral,
+          content: `Could not find role ID : ${roleID}`,
+        });
+        return;
+      }
+    }
+
+    const newRole = {
+      name: role.name,
+      id: role.id,
+    };
+    if (subCommand === "add") {
+      await addGuildRole(interaction.guild.id, newRole);
+      await interaction.followUp({
+        flags: MessageFlags.Ephemeral,
+        content: `Successfully adding role ${role.name}.`,
+      });
+    }
+
+    if (subCommand === "remove") {
+      await removeGuildRole(interaction.guild.id, newRole);
+      await interaction.followUp({
+        flags: MessageFlags.Ephemeral,
+        content: `Successfully removing role ${role.name}.`,
+      });
+    }
+  },
 };
