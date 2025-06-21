@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const { REST, Routes } = require("discord.js");
-const { getSecret } = require("./GCP/secret_manager");
 const { loadEnv } = require("./utility/env");
 
 loadEnv();
@@ -72,8 +71,11 @@ const rest = new REST({ version: "10" }).setToken(
     }
 
     console.log("[✓] Successfully reloaded application (/) commands.");
+    console.log("=======================================================");
   } catch (error) {
+    console.log("=========== ERROR DETECTED WHILE DEPLOYING ============");
     console.error(`[!] Error deploying commands: ${error.message}`);
+    console.log("=======================================================");
     process.exit(1);
   }
 })();
