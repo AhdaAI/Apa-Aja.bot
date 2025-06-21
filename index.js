@@ -5,7 +5,6 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
 });
 const { getSecret } = require("./GCP/secret_manager");
-const { initializeFirestore } = require("./GCP/firestore");
 let envFileName;
 
 if (process.env.NODE_ENV === "production") {
