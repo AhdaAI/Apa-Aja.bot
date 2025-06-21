@@ -2,44 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const { REST, Routes } = require("discord.js");
 const { getSecret } = require("./GCP/secret_manager");
+const { loadEnv } = require("./utility/env");
 
-// Load environment variables
-let envFileName;
-if (process.env.NODE_ENV === "production") {
-  console.log("===== Running in production environment. =====");
-  envFileName = ".env.production";
-} else {
-  console.log("===== Running in development environment. =====");
-  envFileName = ".env.development";
-}
-
-let envFilePath = path.join(__dirname, envFileName);
-if (!fs.existsSync(envFilePath)) {
-  console.error(
-    `[!] Environment file ${envFileName} not found at ${envFilePath}`
-  );
-  console.log(
-    "[?] Please create the file with the required environment variables."
-  );
-  process.exit(1);
-}
-try {
-  const envFile = fs.readFileSync(envFilePath, "utf8");
-  const envLines = envFile.split("\n");
-  envLines.forEach((line) => {
-    const trimmedLine = line.trim();
-    if (trimmedLine && !trimmedLine.startsWith("#")) {
-      const [key, value] = trimmedLine.split("=");
-      if (key && value) {
-        process.env[key] = value;
-      }
-    }
-  });
-  console.log("[ ] Environment variables loaded successfully.");
-} catch (error) {
-  console.error(`[?] Error reading .env file: ${error.message}`);
-  process.exit(1);
-}
+loadEnv();
 
 const commands = [];
 const folderPath = path.join(__dirname, "commands");
@@ -79,7 +44,7 @@ const rest = new REST({ version: "10" }).setToken(
   }
 
   try {
-    console.log("[ ] Attempting to delete all global commands...");
+    console.log("[!] Attempting to delete all global commands...");
     // Sending an empty array to the global commands endpoint
     await rest.put(
       Routes.applicationCommands(process.env.CLIENT_ID),
@@ -89,12 +54,12 @@ const rest = new REST({ version: "10" }).setToken(
     console.log("[ ] Started refreshing application (/) commands.");
 
     if (process.env.NODE_ENV === "production") {
-      console.log("[ ] Deploying commands to production environment.");
+      console.log("[ ] Deploying commands to production environment...");
       await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
         body: commands,
       });
     } else {
-      console.log("[ ] Deploying commands to development environment.");
+      console.log("[ ] Deploying commands to development environment...");
       await rest.put(
         Routes.applicationGuildCommands(
           process.env.CLIENT_ID,
@@ -106,7 +71,7 @@ const rest = new REST({ version: "10" }).setToken(
       );
     }
 
-    console.log("[ ] Successfully reloaded application (/) commands.");
+    console.log("[✓] Successfully reloaded application (/) commands.");
   } catch (error) {
     console.error(`[!] Error deploying commands: ${error.message}`);
     process.exit(1);
