@@ -1,5 +1,6 @@
 const FS = require("fs");
 const PATH = require("path");
+const { getSecret } = require("../GCP/secret_manager");
 
 const essentialEnv = ["DISCORD_TOKEN", "CLIENT_ID"];
 
@@ -15,6 +16,7 @@ const loadEnv = () => {
     console.log("-------------- ENVIRONMENT: DEVELOPMENT ---------------");
     console.log("=======================================================");
     envFileName = "../.env.development";
+    essentialEnv.push("GUILD_ID");
   }
 
   let envFilePath = PATH.join(__dirname, envFileName);
@@ -45,8 +47,8 @@ const loadEnv = () => {
     process.exit(1);
   }
 
-  checkEnv()
-}
+  checkEnv();
+};
 
 const checkEnv = () => {
   const missingEnv = [];
@@ -57,20 +59,63 @@ const checkEnv = () => {
       continue;
     }
 
+    const secretManager = gcpEnv(varName);
+    if (secretManager) {
+      console.log(`[✓] ${varName} loaded.`);
+      continue;
+    }
+
     console.error(`[?] Error: ${varName} is missing or empty.`);
     missingEnv.push(varName);
   }
 
   if (missingEnv > 0) {
-    console.log("--- ERROR SOME OF ESSENTIAL ENVIRONMENT IS MISSING ----");
+    console.log("--- ERROR: SOME OF ESSENTIAL ENVIRONMENT IS MISSING ---");
     console.log("[?] Missing environment: ", missingEnv.join(", "));
     process.exit(1);
   }
 
   console.log("----------- Environment Loaded Successfully -----------");
-}
+};
+
+const gcpEnv = async (varName) => {
+  // Check for GCP variable
+  const gcpVariable = [
+    "GOOGLE_APPLICATION_CREDENTIALS",
+    "GOOGLE_CLOUD_PROJECT",
+  ];
+  for (const variable of gcpVariable) {
+    if (!process.env[variable]) {
+      console.log(`[!] ${variable} is missing or empty.`);
+    }
+  }
+
+  // Check for service account file location
+  const serviceAccountPath = PATH.join(
+    __dirname,
+    `../${process.env.GOOGLE_APPLICATION_CREDENTIALS}`
+  );
+  if (!FS.existsSync(serviceAccountPath)) {
+    console.error("[!] Error: Failed to locate service account file.");
+    console.log("------ Please add missing service account file. -------");
+    console.log("=======================================================");
+    process.exit(1);
+  }
+
+  const secret = await getSecret(varName);
+  if (!secret) {
+    console.log(
+      "[!] Error: Failed to fetch missing environment from GCP Secret Manager"
+    );
+    return false;
+  }
+
+  process.env[varName] = secret;
+  return true;
+};
 
 module.exports = {
   loadEnv,
   checkEnv,
+  gcpEnv,
 };
