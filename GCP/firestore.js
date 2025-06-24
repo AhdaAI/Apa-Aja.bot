@@ -1,5 +1,6 @@
 const { Firestore, Timestamp } = require("@google-cloud/firestore");
 const path = require("path");
+const logger = require("../utility/logger")
 
 const collectionName = "guilds";
 
@@ -28,7 +29,7 @@ async function setGuildConfig(guildId, configData) {
       { merge: true }
     );
   } catch (error) {
-    console.error(`[?] Error saving guild config for ${guildId}: `, error);
+    logger.error(`[?] Error saving guild config for ${guildId}: `, error);
     throw error;
   }
 }
@@ -49,7 +50,7 @@ async function checkGuildConfig(guildId) {
 
     return true;
   } catch (error) {
-    console.error(`Error when checking for guild ${guildId}: `, error);
+    logger.error(`Error when checking for guild ${guildId}: `, error);
     throw error;
   }
 }
@@ -70,7 +71,7 @@ async function getGuildConfig(guildId) {
 
     return doc.data();
   } catch (error) {
-    console.error(`[?] Error getting guild config for ${guildId}: `, error);
+    logger.error(`[?] Error getting guild config for ${guildId}: `, error);
     throw error;
   }
 }
@@ -90,7 +91,7 @@ async function updateGuildConfig(guildId, updates) {
       lastUpdated: Timestamp.now(),
     });
   } catch (error) {
-    console.error(`[?] Error updating guild config for ${guildId}: `, error);
+    logger.error(`[?] Error updating guild config for ${guildId}: `, error);
     throw error;
   }
 }
@@ -105,7 +106,7 @@ async function deleteGuildConfig(guildId) {
   try {
     await db.collection(collectionName).doc(guildId).delete();
   } catch (error) {
-    console.error(`Error deleting guild config for ${guildId}:`, error);
+    logger.error(`Error deleting guild config for ${guildId}:`, error);
     throw error;
   }
 }
@@ -126,7 +127,7 @@ async function addGuildRole(guildId, role) {
       lastUpdated: Timestamp.now(),
     });
   } catch (error) {
-    console.error(`Error adding role to guild ${guildId}:`, error);
+    logger.error(`Error adding role to guild ${guildId}:`, error);
     throw error;
   }
 }
@@ -146,7 +147,7 @@ async function removeGuildRole(guildId, role) {
       lastUpdated: Timestamp.now(),
     });
   } catch (error) {
-    console.error(`Error removing role from guild ${guildId}:`, error);
+    logger.error(`Error removing role from guild ${guildId}:`, error);
     throw error;
   }
 }
@@ -167,7 +168,7 @@ async function updateSubscriptionStatus(guildId, subscriptionType, status) {
       lastUpdated: Timestamp.now(),
     });
   } catch (error) {
-    console.error(`Error updating subscription for guild ${guildId}:`, error);
+    logger.error(`Error updating subscription for guild ${guildId}:`, error);
     throw error;
   }
 }

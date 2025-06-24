@@ -3,6 +3,7 @@ const {
   ChatInputCommandInteraction,
   MessageFlags,
 } = require("discord.js");
+const logger = require("../utility/logger")
 
 module.exports = {
   name: Events.InteractionCreate,
@@ -18,15 +19,15 @@ module.exports = {
     const command = client.commands.get(interaction.commandName);
 
     if (!command) {
-      console.error(`[!] Command ${interaction.commandName} not found.`);
+      logger.warn(`Command ${interaction.commandName} not found.`);
       return;
     }
 
     try {
       await command.execute(interaction, client);
     } catch (error) {
-      console.error(
-        `[!] Error executing command ${interaction.commandName}:`,
+      logger.error(
+        `Error executing command ${interaction.commandName}:`,
         error
       );
       if (interaction.replied) {
