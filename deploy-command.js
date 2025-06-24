@@ -50,15 +50,15 @@ const rest = new REST({ version: "10" }).setToken(
       { body: [] } // Send an empty array
     );
 
-    console.log("[ ] Started refreshing application (/) commands.");
+    console.log("Started refreshing application (/) commands.");
 
     if (process.env.NODE_ENV === "production") {
-      console.log("[ ] Deploying commands to production environment...");
+      console.log("Deploying commands to production environment...");
       await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
         body: commands,
       });
     } else {
-      console.log("[ ] Deploying commands to development environment...");
+      console.log("Deploying commands to development environment...");
       await rest.put(
         Routes.applicationGuildCommands(
           process.env.CLIENT_ID,
@@ -68,6 +68,13 @@ const rest = new REST({ version: "10" }).setToken(
           body: commands,
         }
       );
+
+      if (process.argv.includes("--global") || process.argv.includes("--globals") || process.argv.includes("-g")) {
+        console.log("Deploy commands globally...");
+        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+          body: commands,
+        });
+      }
     }
 
     console.log("[✓] Successfully reloaded application (/) commands.");
