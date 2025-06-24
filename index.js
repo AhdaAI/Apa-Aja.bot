@@ -1,3 +1,4 @@
+const logger = require('./utility/logger')
 const FS = require("fs");
 const PATH = require("path");
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
@@ -17,9 +18,9 @@ for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
   if (command.data && command.execute) {
     client.commands.set(command.data.name, command);
-    console.log(`[✓] Command ${command.data.name} loaded successfully.`);
+    logger.info(`Command ${command.data.name} loaded successfully.`)
   } else {
-    console.warn(`[!] Command ${file} is missing required properties.`);
+    logger.warn(`Command ${file} is missing required properties.`)
   }
 }
 
@@ -35,9 +36,9 @@ for (const file of eventFiles) {
     } else {
       client.on(event.name, (...args) => event.execute(...args, client));
     }
-    console.log(`[✓] Event ${event.name} loaded successfully.`);
+    logger.info(`Event ${event.name} loaded successfully.`);
   } else {
-    console.warn(`[!] Event ${file} is missing required properties.`);
+    logger.warn(`Event ${file} is missing required properties.`);
   }
 }
 
