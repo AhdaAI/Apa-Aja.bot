@@ -38,3 +38,6 @@ service-account.json
 service-account-*.json
 credentials.json
 .gcloud/
+
+# Dev container
+.devcontainer/
