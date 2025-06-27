@@ -1,6 +1,8 @@
 const { Firestore, Timestamp } = require("@google-cloud/firestore");
 const path = require("path");
-const logger = require("../utility/logger")
+const fs = require("fs").promises;
+
+const logger = require("../utility/logger");
 
 const collectionName = "guilds";
 
@@ -8,6 +10,37 @@ const db = new Firestore({
   projectId: process.env.GOOGLE_CLOUD_PROJECT,
   databaseId: process.env.GOOGLE_DATABASE,
 });
+
+/**
+ * @typedef {object} DefaultDatabaseConfig
+ * @property {string} id - The unique identifier for the database configuration.
+ * @property {string} title - The title of the project or configuration.
+ * @property {Array<Object>} roles - An array of role objects, each with 'name' (string) and 'id' (number).
+ * @property {object} subscription - Subscription details.
+ * @property {boolean} subscription.epic - Indicates if Epic Games subscription is enabled.
+ * @property {boolean} subscription.steam - Indicates if Steam subscription is enabled.
+ * @property {string} webhook - The webhook URL, or an empty string if not configured.
+ */
+/**
+ * Fetch default configuration from a JSON file.
+ * @returns {Promise<DefaultDatabaseConfig|undefined>}
+ */
+async function loadDefaultConfig() {
+  try {
+    const databaseConfigPath = path.join(
+      __dirname,
+      "../.gcloud/database_default.json"
+    ); // The location of database need to be validated using env
+  
+    const data = await fs.readFile(databaseConfigPath, 'utf8')
+    // Parse the JSON data
+    /** @type {DefaultDatabaseConfig} */
+    const parsedConfig = JSON.parse(data);
+    return parsedConfig
+  } catch (error) {
+    logger.warn(error)
+  }
+}
 
 // ----- Guild Config -----
 /**
@@ -174,6 +207,7 @@ async function updateSubscriptionStatus(guildId, subscriptionType, status) {
 }
 
 module.exports = {
+  loadDefaultConfig,
   setGuildConfig,
   getGuildConfig,
   updateGuildConfig,
