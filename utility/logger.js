@@ -5,17 +5,30 @@ const formatPrint = printf(({ level, message, label, timestamp }) => {
   return `${timestamp} [ ${level} ] ${message}`;
 });
 
-const errorPrint = printf(({ level, message, label, timestamp }) => {
+const errorPrint = printf(({ level, message, label, timestamp, stack }) => {
   let formatted = [
-    "=======================================================",
+    "\n=======================================================",
     "------------------------ ERROR ------------------------",
     "=======================================================",
-    message,
+    stack,
     "=======================================================",
     `---------------------- ${timestamp} -----------------------`,
-    "======================================================="
-  ]
-  return formatted.join("\n")
+    "=======================================================\n",
+  ];
+  return formatted.join("\n");
+});
+
+const warnPrint = printf(({ level, message, label, timestamp, stack }) => {
+  let formatted = [
+    "\n=======================================================",
+    "------------------------ WARN -------------------------",
+    "=======================================================",
+    stack,
+    "=======================================================",
+    `---------------------- ${timestamp} -----------------------`,
+    "=======================================================\n",
+  ];
+  return formatted.join("\n");
 });
 
 const logger = createLogger({
@@ -35,6 +48,7 @@ const logger = createLogger({
         timestamp({
           format: "HH:mm:ss",
         }),
+        format.errors({ stack: true }),
         errorPrint
       ),
     }),
@@ -44,7 +58,8 @@ const logger = createLogger({
         timestamp({
           format: "HH:mm:ss",
         }),
-        formatPrint
+        format.errors({ stack: true }),
+        warnPrint
       ),
     }),
   ],

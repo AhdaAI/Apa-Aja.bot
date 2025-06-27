@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { REST, Routes } = require("discord.js");
 const { loadEnv } = require("./utility/env");
-const logger = require("./utility/logger")
+const logger = require("./utility/logger");
 
 loadEnv();
 
@@ -43,24 +43,34 @@ const rest = new REST({ version: "10" }).setToken(
     process.exit(1);
   }
 
-  try {
-    logger.info("Attempting to delete all global commands...");
-    // Sending an empty array to the global commands endpoint
-    await rest.put(
+  logger.info("Attempting to delete all global commands...");
+  // Sending an empty array to the global commands endpoint
+  await rest
+    .put(
       Routes.applicationCommands(process.env.CLIENT_ID),
       { body: [] } // Send an empty array
-    );
+    )
+    .catch((error) => {
+      logger.error("GLOBAL DELETION ERROR. ", error);
+      process.exit(1);
+    });
 
-    logger.info("Started refreshing application (/) commands.");
+  logger.info("Started refreshing application (/) commands.");
 
-    if (process.env.NODE_ENV === "production") {
-      logger.info("Deploying commands to production environment...");
-      await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+  if (process.env.NODE_ENV === "production") {
+    logger.info("Deploying commands to production environment...");
+    await rest
+      .put(Routes.applicationCommands(process.env.CLIENT_ID), {
         body: commands,
+      })
+      .catch((error) => {
+        logger.error("GLOBAL DEPLOY ERROR. ", error);
+        process.exit(1);
       });
-    } else {
-      logger.info("Deploying commands to development environment...");
-      await rest.put(
+  } else {
+    logger.info("Deploying commands to development environment...");
+    await rest
+      .put(
         Routes.applicationGuildCommands(
           process.env.CLIENT_ID,
           process.env.GUILD_ID || ""
@@ -68,19 +78,28 @@ const rest = new REST({ version: "10" }).setToken(
         {
           body: commands,
         }
-      );
+      )
+      .catch((error) => {
+        logger.error("GUILD DEPLOY ERROR. ", error);
+        process.exit(1);
+      });
 
-      if (process.argv.includes("--global") || process.argv.includes("--globals") || process.argv.includes("-g")) {
-        logger.info("Deploy commands globally...");
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+    if (
+      process.argv.includes("--global") ||
+      process.argv.includes("--globals") ||
+      process.argv.includes("-g")
+    ) {
+      logger.info("Deploy commands globally...");
+      await rest
+        .put(Routes.applicationCommands(process.env.CLIENT_ID), {
           body: commands,
+        })
+        .catch((error) => {
+          logger.error("GLOBAL DEPLOY ERROR. ", error);
+          process.exit(1);
         });
-      }
     }
-
-    logger.info("Successfully reloaded application (/) commands.");
-  } catch (error) {
-    logger.error(`Error deploying commands: ${error.message}`);
-    process.exit(1);
   }
+
+  logger.info("Successfully reloaded application (/) commands.");
 })();
