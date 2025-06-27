@@ -31,14 +31,14 @@ async function loadDefaultConfig() {
       __dirname,
       "../.gcloud/database_default.json"
     ); // The location of database need to be validated using env
-  
-    const data = await fs.readFile(databaseConfigPath, 'utf8')
+
+    const data = await fs.readFile(databaseConfigPath, "utf8");
     // Parse the JSON data
     /** @type {DefaultDatabaseConfig} */
     const parsedConfig = JSON.parse(data);
-    return parsedConfig
+    return parsedConfig;
   } catch (error) {
-    logger.warn(error)
+    logger.warn(error);
   }
 }
 
