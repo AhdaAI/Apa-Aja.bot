@@ -1,5 +1,5 @@
 const { Events, Guild } = require("discord.js");
-const { setGuildConfig } = require("../GCP/firestore");
+const { setGuildConfig, loadDefaultConfig } = require("../GCP/firestore");
 
 module.exports = {
   name: Events.GuildCreate,
@@ -9,18 +9,11 @@ module.exports = {
    */
   async execute(guild) {
     try {
-      const guildData = {
-        id: guild.id,
-        title: guild.name,
-        roles: [],
-        subscription: {
-          epic: false,
-          steam: false,
-        },
-        webhook: "",
-      };
+      const defaultData = await loadDefaultConfig()
+      defaultData.id = guild.id
+      defaultData.title = guild.name
 
-      await setGuildConfig(guild.id, guildData);
+      await setGuildConfig(guild.id, defaultData);
     } catch (error) {
       throw error;
     }
