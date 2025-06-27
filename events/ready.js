@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const logger = require("../utility/logger")
+const logger = require("../utility/logger");
 
 module.exports = {
   name: Events.ClientReady,
@@ -13,6 +13,6 @@ module.exports = {
       console.log("\n============== ENVIRONMENT: DEVELOPMENT ===============");
     }
     console.log("----- Bot is ready to receive commands and events. ----");
-    console.log("=======================================================");
+    console.log("=======================================================\n");
   },
 };

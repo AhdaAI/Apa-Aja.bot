@@ -15,11 +15,16 @@ const db = new Firestore({
  * @typedef {object} DefaultDatabaseConfig
  * @property {string} id - The unique identifier for the database configuration.
  * @property {string} title - The title of the project or configuration.
- * @property {Array<Object>} roles - An array of role objects, each with 'name' (string) and 'id' (number).
+ * @property {DefaultRoleConfig} roles - An array of role objects, each with 'name' (string) and 'id' (number).
  * @property {object} subscription - Subscription details.
  * @property {boolean} subscription.epic - Indicates if Epic Games subscription is enabled.
  * @property {boolean} subscription.steam - Indicates if Steam subscription is enabled.
  * @property {string} webhook - The webhook URL, or an empty string if not configured.
+ */
+/**
+ * @typedef {object} DefaultRoleConfig
+ * @property {string} id
+ * @property {string} name
  */
 /**
  * Fetch default configuration from a JSON file.
@@ -92,7 +97,7 @@ async function checkGuildConfig(guildId) {
 /**
  * Retrieves a guild's configuration.
  * @param {string} guildId The Discord Guild ID.
- * @returns {Promise<object|null>} The configuration object or null if not found.
+ * @returns {Promise<DefaultDatabaseConfig|null>} The configuration object or null if not found.
  */
 async function getGuildConfig(guildId) {
   try {
@@ -102,6 +107,7 @@ async function getGuildConfig(guildId) {
       return null;
     }
 
+    /**@type {DefaultDatabaseConfig} */
     return doc.data();
   } catch (error) {
     logger.error(`[?] Error getting guild config for ${guildId}: `, error);
