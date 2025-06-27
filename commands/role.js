@@ -14,7 +14,7 @@ const {
   addGuildRole,
   removeGuildRole,
 } = require("../GCP/firestore");
-const logger = require("../utility/logger")
+const logger = require("../utility/logger");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -70,9 +70,10 @@ module.exports = {
     if (subCommand === "help") {
       await interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "Add and remove role based on the selected role or the role id."
-      })
-      return
+        content:
+          "Add and remove role based on the selected role or the role id.",
+      });
+      return;
     }
 
     await interaction.reply({
@@ -109,7 +110,7 @@ module.exports = {
           interaction.guild.roles.cache.get(roleID) ??
           (await interaction.guild.roles.fetch(roleID));
       } catch (error) {
-        logger.warn(`[?] Error fetching role ${roleID}`);
+        logger.warn(`Error fetching role ${roleID}`);
         await interaction.followUp({
           flags: MessageFlags.Ephemeral,
           content: `Could not find role ID : ${roleID}`,
