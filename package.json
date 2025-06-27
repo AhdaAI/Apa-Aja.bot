@@ -4,8 +4,8 @@
   "description": "Discord bot integrated with google cloud provider.",
   "main": "index.js",
   "scripts": {
-    "deploy": "node deploy-command.js -- ",
-    "start": "node index.js -- "
+    "deploy": "node deploy-command.js",
+    "start": "node index.js"
   },
   "keywords": [
     "Discord",
