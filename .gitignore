@@ -41,3 +41,4 @@ credentials.json
 
 # Dev container
 .devcontainer/
+Dockerfile
