@@ -18,19 +18,6 @@ const errorPrint = printf(({ level, message, label, timestamp, stack }) => {
   return formatted.join("\n");
 });
 
-const warnPrint = printf(({ level, message, label, timestamp, stack }) => {
-  let formatted = [
-    "\n=======================================================",
-    "------------------------ WARN -------------------------",
-    "=======================================================",
-    stack,
-    "=======================================================",
-    `---------------------- ${timestamp} -----------------------`,
-    "=======================================================\n",
-  ];
-  return formatted.join("\n");
-});
-
 const logger = createLogger({
   transports: [
     new transports.Console({
@@ -50,16 +37,6 @@ const logger = createLogger({
         }),
         format.errors({ stack: true }),
         errorPrint
-      ),
-    }),
-    new transports.Console({
-      level: "warn",
-      format: combine(
-        timestamp({
-          format: "HH:mm:ss",
-        }),
-        format.errors({ stack: true }),
-        warnPrint
       ),
     }),
   ],
