@@ -5,6 +5,7 @@ const {
   PermissionsBitField,
   EmbedBuilder,
   PermissionFlagsBits,
+  codeBlock,
 } = require("discord.js");
 const {
   getGuildConfig,
@@ -13,8 +14,29 @@ const {
   checkGuildConfig,
   addGuildRole,
   removeGuildRole,
+  loadDefaultConfig,
 } = require("../GCP/firestore");
+const path = require("path");
+const fs = require("fs").promises;
 const logger = require("../utility/logger");
+
+/**
+ * @typedef {object} DefaultRoleConfig
+ * @property {string} id
+ * @property {string} name
+ */
+async function loadRoleConfig() {
+  try {
+    const roleConfigPath = path.join(__dirname, "../.gcloud/role_default.json");
+    const data = await fs.readFile(roleConfigPath, "utf8");
+    /**@type {DefaultRoleConfig} */
+    const parsedConfig = JSON.parse(data);
+
+    return parsedConfig;
+  } catch (error) {
+    logger.warn(error);
+  }
+}
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -23,6 +45,9 @@ module.exports = {
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand((subcommand) =>
       subcommand.setName("help").setDescription("Show help.")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("show").setDescription("Show list of role registered.")
     )
     .addSubcommand((subcommand) =>
       subcommand
@@ -81,25 +106,71 @@ module.exports = {
       content: "Processing command...",
     });
 
-    const dataExists = await checkGuildConfig(interaction.guildId);
-    if (!dataExists) {
-      try {
-        const defaultData = {
-          id: interaction.guild.id,
-          title: interaction.guild.name,
-          roles: [],
-          subscription: {
-            epic: false,
-            steam: false,
-          },
-          webhook: "",
-        };
-        await setGuildConfig(interaction.guildId, defaultData);
-      } catch (error) {
-        throw error;
+    if (subCommand === "show") {
+      const data = await getGuildConfig(interaction.guild.id);
+      const embedFields = [];
+      for (const key of Object.keys(data)) {
+        if (data[key] === "") {
+          continue;
+        }
+
+        if (key === "lastUpdated") {
+          continue;
+        }
+
+        const fieldTitle = key.charAt(0).toUpperCase() + key.slice(1);
+        if (key === "subscription") {
+          const listSub = [
+            `Epic: ${data[key].epic}`,
+            `Steam: ${data[key].steam}`,
+          ];
+          embedFields.push({
+            name: fieldTitle,
+            value: codeBlock(listSub.join("\n")),
+            inline: true,
+          });
+          continue;
+        }
+
+        if (key === "roles") {
+          const roles = [];
+          for (const role of data[key]) {
+            roles.push(role.name);
+          }
+          embedFields.push({
+            name: fieldTitle,
+            value: codeBlock(roles.join("\n")),
+            inline: true,
+          });
+          continue;
+        }
+
+        embedFields.push({
+          name: fieldTitle,
+          value: codeBlock(data[key]),
+          inline: true,
+        });
       }
+      const embed = new EmbedBuilder()
+        .setTitle("Stored Data")
+        .setFields(embedFields)
+        .setThumbnail(interaction.guild.iconURL())
+        .setTimestamp(data.lastUpdated.toDate());
+
+      await interaction
+        .editReply({
+          flags: MessageFlags.Ephemeral,
+          embeds: [embed],
+          content: "Process Complete!",
+        })
+        .catch((error) => logger.error(error));
+
+      return;
     }
 
+    /* 
+      Role Adding and Removing functions 
+    */
     const roleID = options.getString("id");
 
     let role = options.getRole("role");
