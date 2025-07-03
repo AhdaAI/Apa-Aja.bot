@@ -19,13 +19,18 @@ const db = new Firestore({
  * @property {object} subscription - Subscription details.
  * @property {boolean} subscription.epic - Indicates if Epic Games subscription is enabled.
  * @property {boolean} subscription.steam - Indicates if Steam subscription is enabled.
- * @property {string} webhook - The webhook URL, or an empty string if not configured.
+ * @property {WebhookData} webhook - The webhook URL, or an empty string if not configured.
  * @property {Date} lastUpdated
  */
 /**
  * @typedef {object} DefaultRoleConfig
  * @property {string} id
  * @property {string} name
+ */
+/**
+ * @typedef {object} WebhookData
+ * @property {string} url
+ * @property {Timestamp} updateAt
  */
 /**
  * Fetch default configuration from a JSON file.
