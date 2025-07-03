@@ -15,7 +15,7 @@ const db = new Firestore({
  * @typedef {object} DefaultDatabaseConfig
  * @property {string} id - The unique identifier for the database configuration.
  * @property {string} title - The title of the project or configuration.
- * @property {DefaultRoleConfig} roles - An array of role objects, each with 'name' (string) and 'id' (number).
+ * @property {Array<DefaultRoleConfig>} roles - An array of role objects, each with 'name' (string) and 'id' (number).
  * @property {object} subscription - Subscription details.
  * @property {boolean} subscription.epic - Indicates if Epic Games subscription is enabled.
  * @property {boolean} subscription.steam - Indicates if Steam subscription is enabled.
