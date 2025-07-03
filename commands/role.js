@@ -137,6 +137,7 @@ module.exports = {
         .addOptions(dropOptions);
 
       const actionRow = new ActionRowBuilder().addComponents(dropDown);
+      await interaction.editReply({ content: "Dropdown published!" });
       return await channel.send({ components: [actionRow] });
     }
 
