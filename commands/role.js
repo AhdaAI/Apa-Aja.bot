@@ -6,6 +6,9 @@ const {
   EmbedBuilder,
   PermissionFlagsBits,
   codeBlock,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  ActionRowBuilder,
 } = require("discord.js");
 const {
   getGuildConfig,
@@ -82,6 +85,17 @@ module.exports = {
             .setDescription("Input role ID...")
             .setRequired(false)
         )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("publish")
+        .setDescription("Publish the dropdown menu to selected channel.")
+        .addChannelOption((option) =>
+          option
+            .setName("channel")
+            .setDescription("Target channel.")
+            .setRequired(true)
+        )
     ),
 
   /**
@@ -106,15 +120,35 @@ module.exports = {
       content: "Processing command...",
     });
 
+    if (subCommand === "publish") {
+      const channel = interaction.options.getChannel("channel");
+      const data = await getGuildConfig(interaction.guild.id);
+      const dropOptions = [];
+      data.roles.forEach((element) => {
+        dropOptions.push(
+          new StringSelectMenuOptionBuilder()
+            .setLabel(element.name)
+            .setValue(element.id)
+        );
+      });
+      const dropDown = new StringSelectMenuBuilder()
+        .setCustomId("role")
+        .setPlaceholder("Choose your role...")
+        .addOptions(dropOptions);
+
+      const actionRow = new ActionRowBuilder().addComponents(dropDown);
+      return await channel.send({ components: [actionRow] });
+    }
+
     if (subCommand === "show") {
       const data = await getGuildConfig(interaction.guild.id);
       const embedFields = [];
       for (const key of Object.keys(data)) {
-        if (data[key] === "") {
-          continue;
-        }
-
-        if (key === "lastUpdated") {
+        if (
+          key === "lastUpdated" ||
+          data[key] === "" ||
+          data[key].length === 0
+        ) {
           continue;
         }
 
@@ -137,6 +171,7 @@ module.exports = {
           for (const role of data[key]) {
             roles.push(role.name);
           }
+
           embedFields.push({
             name: fieldTitle,
             value: codeBlock(roles.join("\n")),
@@ -190,11 +225,23 @@ module.exports = {
       }
     }
 
-    const newRole = {
-      name: role.name,
-      id: role.id,
-    };
+    const newRole = await loadRoleConfig();
+    newRole.name = role.name;
+    newRole.id = role.id;
     if (subCommand === "add") {
+      const responses = [
+        "# ABORTED",
+        "## Hierarchy issue",
+        "Bot hierarchy is lower then the selected role, please move bot role higher.",
+      ];
+      const botHighestRole = interaction.guild.members.me.roles.highest;
+      if (botHighestRole.position < role.position) {
+        return await interaction.editReply({
+          flags: MessageFlags.Ephemeral,
+          content: responses.join("\n"),
+        });
+      }
+
       await addGuildRole(interaction.guild.id, newRole);
       await interaction.followUp({
         flags: MessageFlags.Ephemeral,
